@@ -1,65 +1,42 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import MetricCard from '@/components/dashboard/metric-card'
 import { Users, BarChart3, TrendingUp, Activity } from 'lucide-react'
+import { getCompanyBySlugAndId, getUsersByCompany, getMetricsByCompany } from '@/lib/mock-data'
 
 interface Props {
   params: { companySlug: string; companyId: string }
 }
 
-export default async function DashboardPage({ params }: Props) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+export default function DashboardPage({ params }: Props) {
+  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  if (!company) notFound()
 
-  const [{ data: company }, { data: metrics }, { data: members }] = await Promise.all([
-    supabase.from('companies').select('*').eq('id', params.companyId).single(),
-    supabase
-      .from('metrics')
-      .select('*')
-      .eq('company_id', params.companyId)
-      .order('recorded_at', { ascending: false })
-      .limit(20),
-    supabase.from('profiles').select('id, role').eq('company_id', params.companyId),
-  ])
-
-  const totalMembers = members?.length ?? 0
-  const totalMetrics = metrics?.length ?? 0
-  const latestValue = metrics?.[0]?.metric_value ?? 0
-  const categories = [...new Set(metrics?.map((m) => m.category).filter(Boolean))]
+  const members = getUsersByCompany(params.companyId)
+  const metrics = getMetricsByCompany(params.companyId)
+  const categories = [...new Set(metrics.map((m) => m.category).filter(Boolean))]
 
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{company?.name}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{company.name}</h1>
         <p className="text-gray-500 mt-1">Company overview and recent activity</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <MetricCard
-          title="Team Members"
-          value={String(totalMembers)}
-          icon={Users}
-          color="blue"
-        />
-        <MetricCard
-          title="Total Metrics"
-          value={String(totalMetrics)}
-          icon={BarChart3}
-          color="green"
-        />
+        <MetricCard title="Team Members" value={String(members.length)} icon={Users} color="blue" />
+        <MetricCard title="Total Metrics" value={String(metrics.length)} icon={BarChart3} color="green" />
         <MetricCard
           title="Latest Value"
-          value={String(latestValue)}
+          value={String(metrics[0]?.metric_value ?? 0)}
           icon={TrendingUp}
           color="purple"
-          subtitle={metrics?.[0]?.metric_name ?? ''}
+          subtitle={metrics[0]?.metric_name ?? ''}
         />
         <MetricCard
           title="Status"
-          value={company?.is_active ? 'Active' : 'Inactive'}
+          value={company.is_active ? 'Active' : 'Inactive'}
           icon={Activity}
-          color={company?.is_active ? 'green' : 'red'}
+          color={company.is_active ? 'green' : 'red'}
         />
       </div>
 
@@ -78,7 +55,7 @@ export default async function DashboardPage({ params }: Props) {
         <div className="p-6 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">Recent Metrics</h2>
         </div>
-        {metrics && metrics.length > 0 ? (
+        {metrics.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -93,17 +70,13 @@ export default async function DashboardPage({ params }: Props) {
                 {metrics.map((m) => (
                   <tr key={m.id} className="hover:bg-gray-50">
                     <td className="py-3 px-6 font-medium text-gray-900">{m.metric_name}</td>
-                    <td className="py-3 px-6 text-gray-700">{m.metric_value}</td>
+                    <td className="py-3 px-6 text-gray-700">{m.metric_value} <span className="text-gray-400 text-xs">{m.metric_label}</span></td>
                     <td className="py-3 px-6">
                       {m.category ? (
                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">{m.category}</span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
+                      ) : '—'}
                     </td>
-                    <td className="py-3 px-6 text-gray-500">
-                      {new Date(m.recorded_at).toLocaleDateString()}
-                    </td>
+                    <td className="py-3 px-6 text-gray-500">{new Date(m.recorded_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>

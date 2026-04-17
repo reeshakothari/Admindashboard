@@ -1,45 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Building2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    setError('')
-
-    const supabase = createClient()
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (signInError) {
-      setError(signInError.message)
-      setLoading(false)
-      return
-    }
-
-    if (data.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, company_id, companies(slug)')
-        .eq('id', data.user.id)
-        .single()
-
-      if (profile?.role === 'super_admin') {
-        router.push('/super-admin/dashboard')
-      } else if (profile?.company_id) {
-        const slug = (profile.companies as { slug: string } | null)?.slug
-        router.push(`/${slug}/${profile.company_id}/dashboard`)
-      }
-    }
+    // Simulate loading, then redirect to super admin dashboard
+    await new Promise((r) => setTimeout(r, 800))
+    router.push('/super-admin/dashboard')
   }
 
   return (
@@ -63,7 +39,6 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="email"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="you@company.com"
             />
@@ -76,17 +51,10 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoComplete="current-password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-100 text-red-700 text-sm px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"
@@ -96,6 +64,10 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <p className="text-xs text-center text-gray-400 mt-6">
+          Frontend preview — any credentials will work
+        </p>
       </div>
     </div>
   )

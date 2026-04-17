@@ -1,31 +1,16 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import AddUserForm from '@/components/users/add-user-form'
+import { getCompanyBySlugAndId, getUsersByCompany } from '@/lib/mock-data'
 
 interface Props {
   params: { companySlug: string; companyId: string }
 }
 
-export default async function UsersPage({ params }: Props) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+export default function UsersPage({ params }: Props) {
+  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  if (!company) notFound()
 
-  const { data: currentProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-
-  if (!currentProfile || !['admin', 'super_admin'].includes(currentProfile.role)) {
-    redirect(`/${params.companySlug}/${params.companyId}/dashboard`)
-  }
-
-  const { data: users } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('company_id', params.companyId)
-    .order('created_at', { ascending: false })
+  const users = getUsersByCompany(params.companyId)
 
   const roleColors: Record<string, string> = {
     admin: 'bg-blue-50 text-blue-700',
@@ -44,12 +29,10 @@ export default async function UsersPage({ params }: Props) {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="p-6 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">
-                Team Members ({users?.length ?? 0})
-              </h2>
+              <h2 className="font-semibold text-gray-900">Team Members ({users.length})</h2>
             </div>
             <div className="divide-y divide-gray-50">
-              {users?.map((u) => (
+              {users.map((u) => (
                 <div key={u.id} className="flex items-center justify-between px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
@@ -67,13 +50,9 @@ export default async function UsersPage({ params }: Props) {
                   </span>
                 </div>
               ))}
-              {(!users || users.length === 0) && (
-                <div className="px-6 py-12 text-center text-gray-500 text-sm">No users yet</div>
-              )}
             </div>
           </div>
         </div>
-
         <div>
           <AddUserForm companyId={params.companyId} />
         </div>

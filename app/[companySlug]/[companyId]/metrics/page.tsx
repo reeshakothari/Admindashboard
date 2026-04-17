@@ -1,23 +1,17 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { BarChart3 } from 'lucide-react'
+import { getCompanyBySlugAndId, getMetricsByCompany } from '@/lib/mock-data'
 
 interface Props {
   params: { companySlug: string; companyId: string }
 }
 
-export default async function MetricsPage({ params }: Props) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+export default function MetricsPage({ params }: Props) {
+  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  if (!company) notFound()
 
-  const { data: metrics } = await supabase
-    .from('metrics')
-    .select('*')
-    .eq('company_id', params.companyId)
-    .order('recorded_at', { ascending: false })
-
-  const categories = [...new Set(metrics?.map((m) => m.category).filter(Boolean))]
+  const metrics = getMetricsByCompany(params.companyId)
+  const categories = [...new Set(metrics.map((m) => m.category).filter(Boolean))]
 
   return (
     <div className="p-8">
@@ -29,18 +23,16 @@ export default async function MetricsPage({ params }: Props) {
       {categories.length > 0 && (
         <div className="flex gap-2 mb-6 flex-wrap">
           {categories.map((cat) => (
-            <span key={cat} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-              {cat}
-            </span>
+            <span key={cat} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">{cat}</span>
           ))}
         </div>
       )}
 
       <div className="bg-white rounded-xl border border-gray-200">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">All Metrics ({metrics?.length ?? 0})</h2>
+          <h2 className="font-semibold text-gray-900">All Metrics ({metrics.length})</h2>
         </div>
-        {metrics && metrics.length > 0 ? (
+        {metrics.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -63,9 +55,7 @@ export default async function MetricsPage({ params }: Props) {
                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">{m.category}</span>
                       ) : '—'}
                     </td>
-                    <td className="py-3 px-6 text-gray-500">
-                      {new Date(m.recorded_at).toLocaleString()}
-                    </td>
+                    <td className="py-3 px-6 text-gray-500">{new Date(m.recorded_at).toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>

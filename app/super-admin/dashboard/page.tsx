@@ -1,23 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
 import MetricCard from '@/components/dashboard/metric-card'
 import { Building2, Users, BarChart3, Activity } from 'lucide-react'
 import Link from 'next/link'
+import { MOCK_COMPANIES, MOCK_USERS, MOCK_METRICS } from '@/lib/mock-data'
 
-export default async function SuperAdminDashboard() {
-  const supabase = await createClient()
-
-  const [
-    { count: companiesCount },
-    { count: usersCount },
-    { count: metricsCount },
-    { data: recentCompanies },
-  ] = await Promise.all([
-    supabase.from('companies').select('*', { count: 'exact', head: true }),
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
-    supabase.from('metrics').select('*', { count: 'exact', head: true }),
-    supabase.from('companies').select('*').order('created_at', { ascending: false }).limit(5),
-  ])
-
+export default function SuperAdminDashboard() {
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -26,9 +12,9 @@ export default async function SuperAdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <MetricCard title="Companies" value={String(companiesCount ?? 0)} icon={Building2} color="purple" />
-        <MetricCard title="Total Users" value={String(usersCount ?? 0)} icon={Users} color="blue" />
-        <MetricCard title="Metrics Logged" value={String(metricsCount ?? 0)} icon={BarChart3} color="green" />
+        <MetricCard title="Companies" value={String(MOCK_COMPANIES.length)} icon={Building2} color="purple" />
+        <MetricCard title="Total Users" value={String(MOCK_USERS.length)} icon={Users} color="blue" />
+        <MetricCard title="Metrics Logged" value={String(MOCK_METRICS.length)} icon={BarChart3} color="green" />
         <MetricCard title="Platform Status" value="Active" icon={Activity} color="orange" />
       </div>
 
@@ -40,7 +26,7 @@ export default async function SuperAdminDashboard() {
           </Link>
         </div>
         <div className="divide-y divide-gray-50">
-          {recentCompanies?.map((company) => (
+          {MOCK_COMPANIES.map((company) => (
             <div key={company.id} className="flex items-center justify-between px-6 py-4">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -48,9 +34,7 @@ export default async function SuperAdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{company.name}</p>
-                  <p className="text-xs text-gray-400 font-mono">
-                    /{company.slug}/{company.id.slice(0, 8)}…
-                  </p>
+                  <p className="text-xs text-gray-400 font-mono">/{company.slug}/{company.id.slice(0, 8)}…</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -68,14 +52,6 @@ export default async function SuperAdminDashboard() {
               </div>
             </div>
           ))}
-          {(!recentCompanies || recentCompanies.length === 0) && (
-            <div className="px-6 py-12 text-center text-gray-500 text-sm">
-              No companies yet.{' '}
-              <Link href="/super-admin/companies" className="text-purple-600 font-medium">
-                Create one →
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>

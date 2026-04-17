@@ -1,16 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
-import CreateCompanyForm from '@/components/super-admin/create-company-form'
 import { Building2, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import { MOCK_COMPANIES } from '@/lib/mock-data'
+import CreateCompanyForm from '@/components/super-admin/create-company-form'
 
-export default async function CompaniesPage() {
-  const supabase = await createClient()
-
-  const { data: companies } = await supabase
-    .from('companies')
-    .select('*')
-    .order('created_at', { ascending: false })
-
+export default function CompaniesPage() {
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -22,12 +15,10 @@ export default async function CompaniesPage() {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-gray-200">
             <div className="p-6 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">
-                All Companies ({companies?.length ?? 0})
-              </h2>
+              <h2 className="font-semibold text-gray-900">All Companies ({MOCK_COMPANIES.length})</h2>
             </div>
             <div className="divide-y divide-gray-50">
-              {companies?.map((company) => (
+              {MOCK_COMPANIES.map((company) => (
                 <div key={company.id} className="flex items-center justify-between px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
@@ -35,9 +26,7 @@ export default async function CompaniesPage() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900">{company.name}</p>
-                      <p className="text-xs text-gray-400 font-mono truncate">
-                        /{company.slug}/{company.id}
-                      </p>
+                      <p className="text-xs text-gray-400 font-mono truncate">/{company.slug}/{company.id}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
@@ -56,15 +45,9 @@ export default async function CompaniesPage() {
                   </div>
                 </div>
               ))}
-              {(!companies || companies.length === 0) && (
-                <div className="px-6 py-12 text-center text-gray-500 text-sm">
-                  No companies yet. Create your first one using the form.
-                </div>
-              )}
             </div>
           </div>
         </div>
-
         <div>
           <CreateCompanyForm />
         </div>
