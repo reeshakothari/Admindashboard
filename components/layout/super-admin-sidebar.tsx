@@ -14,9 +14,9 @@ export default function SuperAdminSidebar({ userName, userEmail }: Props) {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/super-admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/super-admin/companies', icon: Building2, label: 'Companies' },
-    { href: '/super-admin/users', icon: Users, label: 'All Users' },
+    { href: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
+    { href: '/admin/companies', icon: Building2, label: 'Companies' },
+    { href: '/admin/users', icon: Users, label: 'All Users' },
   ]
 
   const initials = (userName || userEmail)[0]?.toUpperCase() ?? '?'

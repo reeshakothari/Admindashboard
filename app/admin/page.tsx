@@ -3,7 +3,7 @@ import { Building2, Users, BarChart3, Activity } from 'lucide-react'
 import Link from 'next/link'
 import { MOCK_COMPANIES, MOCK_USERS, MOCK_METRICS } from '@/lib/mock-data'
 
-export default function SuperAdminDashboard() {
+export default function AdminDashboard() {
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -21,7 +21,7 @@ export default function SuperAdminDashboard() {
       <div className="bg-gray-900 rounded-xl border border-gray-800">
         <div className="p-6 border-b border-gray-800 flex items-center justify-between">
           <h2 className="font-semibold text-white">Companies</h2>
-          <Link href="/super-admin/companies" className="text-sm text-purple-400 hover:text-purple-300 font-medium">
+          <Link href="/admin/companies" className="text-sm text-purple-400 hover:text-purple-300 font-medium">
             View all →
           </Link>
         </div>
@@ -34,7 +34,7 @@ export default function SuperAdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white">{company.name}</p>
-                  <p className="text-xs text-gray-500 font-mono">/{company.slug}/{company.id.slice(0, 8)}…</p>
+                  <p className="text-xs text-gray-500 font-mono">/{company.slug}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -43,8 +43,7 @@ export default function SuperAdminDashboard() {
                 }`}>
                   {company.is_active ? 'Active' : 'Inactive'}
                 </span>
-                <Link href={`/${company.slug}/${company.id}/dashboard`}
-                  className="text-xs text-blue-400 hover:text-blue-300 font-medium">
+                <Link href={`/${company.slug}`} className="text-xs text-blue-400 hover:text-blue-300 font-medium">
                   View →
                 </Link>
               </div>

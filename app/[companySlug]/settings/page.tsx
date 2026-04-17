@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
-import { getCompanyBySlugAndId } from '@/lib/mock-data'
+import { getCompanyBySlug } from '@/lib/mock-data'
 
 interface Props {
-  params: { companySlug: string; companyId: string }
+  params: { companySlug: string }
 }
 
 export default function SettingsPage({ params }: Props) {
-  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  const company = getCompanyBySlug(params.companySlug)
   if (!company) notFound()
 
   return (
@@ -40,19 +40,13 @@ export default function SettingsPage({ params }: Props) {
                 </span>
               </dd>
             </div>
-            <div>
-              <dt className="text-xs font-medium text-gray-500 mb-1">Created</dt>
-              <dd className="text-sm text-gray-400">
-                {new Date(company.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-              </dd>
-            </div>
           </dl>
         </div>
 
         <div className="bg-gray-900 rounded-xl border border-gray-800 p-6">
           <h2 className="font-semibold text-white mb-4">Dashboard URL</h2>
           <div className="bg-gray-800 rounded-lg px-4 py-3 font-mono text-sm text-blue-400 break-all">
-            /{company.slug}/{company.id}/dashboard
+            /{company.slug}
           </div>
           <p className="text-xs text-gray-500 mt-2">Share this URL to access the company dashboard directly.</p>
         </div>

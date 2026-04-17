@@ -1,16 +1,16 @@
 import { notFound } from 'next/navigation'
 import { BarChart3 } from 'lucide-react'
-import { getCompanyBySlugAndId, getMetricsByCompany } from '@/lib/mock-data'
+import { getCompanyBySlug, getMetricsByCompany } from '@/lib/mock-data'
 
 interface Props {
-  params: { companySlug: string; companyId: string }
+  params: { companySlug: string }
 }
 
 export default function MetricsPage({ params }: Props) {
-  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  const company = getCompanyBySlug(params.companySlug)
   if (!company) notFound()
 
-  const metrics = getMetricsByCompany(params.companyId)
+  const metrics = getMetricsByCompany(company.id)
   const categories = [...new Set(metrics.map((m) => m.category).filter(Boolean))]
 
   return (

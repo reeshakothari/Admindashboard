@@ -1,18 +1,18 @@
 import { notFound } from 'next/navigation'
 import MetricCard from '@/components/dashboard/metric-card'
 import { Users, BarChart3, TrendingUp, Activity } from 'lucide-react'
-import { getCompanyBySlugAndId, getUsersByCompany, getMetricsByCompany } from '@/lib/mock-data'
+import { getCompanyBySlug, getUsersByCompany, getMetricsByCompany } from '@/lib/mock-data'
 
 interface Props {
-  params: { companySlug: string; companyId: string }
+  params: { companySlug: string }
 }
 
-export default function DashboardPage({ params }: Props) {
-  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+export default function CompanyDashboard({ params }: Props) {
+  const company = getCompanyBySlug(params.companySlug)
   if (!company) notFound()
 
-  const members = getUsersByCompany(params.companyId)
-  const metrics = getMetricsByCompany(params.companyId)
+  const members = getUsersByCompany(company.id)
+  const metrics = getMetricsByCompany(company.id)
   const categories = [...new Set(metrics.map((m) => m.category).filter(Boolean))]
 
   return (

@@ -9,21 +9,18 @@ import type { UserRole } from '@/lib/supabase/types'
 interface SidebarProps {
   companyName: string
   companySlug: string
-  companyId: string
   userRole: UserRole
   userName: string
   userEmail: string
 }
 
-export default function Sidebar({
-  companyName, companySlug, companyId, userRole, userName, userEmail,
-}: SidebarProps) {
+export default function Sidebar({ companyName, companySlug, userRole, userName, userEmail }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const base = `/${companySlug}/${companyId}`
+  const base = `/${companySlug}`
 
   const navItems = [
-    { href: `${base}/dashboard`, icon: LayoutDashboard, label: 'Dashboard', roles: ['super_admin', 'admin', 'client'] },
+    { href: base, icon: LayoutDashboard, label: 'Dashboard', roles: ['super_admin', 'admin', 'client'] },
     { href: `${base}/metrics`, icon: BarChart3, label: 'Metrics', roles: ['super_admin', 'admin', 'client'] },
     { href: `${base}/users`, icon: Users, label: 'Users', roles: ['super_admin', 'admin'] },
     { href: `${base}/settings`, icon: Settings, label: 'Settings', roles: ['super_admin', 'admin'] },
@@ -73,7 +70,7 @@ export default function Sidebar({
             <p className="text-gray-500 text-xs truncate">{userEmail}</p>
           </div>
         </div>
-        <button onClick={() => router.push('/super-admin/dashboard')}
+        <button onClick={() => router.push('/admin')}
           className="flex items-center gap-2 text-gray-500 hover:text-white text-sm w-full px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors">
           <LogOut className="w-4 h-4" />
           Back to platform

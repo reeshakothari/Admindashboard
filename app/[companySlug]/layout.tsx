@@ -1,24 +1,23 @@
 import { notFound } from 'next/navigation'
 import Sidebar from '@/components/layout/sidebar'
-import { getCompanyBySlugAndId, MOCK_USERS } from '@/lib/mock-data'
+import { getCompanyBySlug, MOCK_USERS } from '@/lib/mock-data'
 
 interface Props {
   children: React.ReactNode
-  params: { companySlug: string; companyId: string }
+  params: { companySlug: string }
 }
 
 export default function CompanyLayout({ children, params }: Props) {
-  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  const company = getCompanyBySlug(params.companySlug)
   if (!company) notFound()
 
-  const adminUser = MOCK_USERS.find((u) => u.company_id === params.companyId && u.role === 'admin')
+  const adminUser = MOCK_USERS.find((u) => u.company_id === company.id && u.role === 'admin')
 
   return (
     <div className="flex min-h-screen bg-[#0a0a0f]">
       <Sidebar
         companyName={company.name}
         companySlug={params.companySlug}
-        companyId={params.companyId}
         userRole={adminUser?.role ?? 'admin'}
         userName={adminUser?.full_name ?? 'Admin'}
         userEmail={adminUser?.email ?? 'admin@company.com'}

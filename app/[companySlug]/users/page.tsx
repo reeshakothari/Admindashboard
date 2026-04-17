@@ -1,17 +1,16 @@
 import { notFound } from 'next/navigation'
 import AddUserForm from '@/components/users/add-user-form'
-import { getCompanyBySlugAndId, getUsersByCompany } from '@/lib/mock-data'
+import { getCompanyBySlug, getUsersByCompany } from '@/lib/mock-data'
 
 interface Props {
-  params: { companySlug: string; companyId: string }
+  params: { companySlug: string }
 }
 
 export default function UsersPage({ params }: Props) {
-  const company = getCompanyBySlugAndId(params.companySlug, params.companyId)
+  const company = getCompanyBySlug(params.companySlug)
   if (!company) notFound()
 
-  const users = getUsersByCompany(params.companyId)
-
+  const users = getUsersByCompany(company.id)
   const roleColors: Record<string, string> = {
     admin: 'bg-blue-500/10 text-blue-400',
     client: 'bg-gray-700 text-gray-400',
@@ -49,7 +48,7 @@ export default function UsersPage({ params }: Props) {
             </div>
           </div>
         </div>
-        <div><AddUserForm companyId={params.companyId} /></div>
+        <div><AddUserForm companyId={company.id} /></div>
       </div>
     </div>
   )

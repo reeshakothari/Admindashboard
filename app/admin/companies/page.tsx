@@ -24,9 +24,9 @@ export default function CompaniesPage() {
                     <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center shrink-0">
                       <Building2 className="w-5 h-5 text-gray-400" />
                     </div>
-                    <div className="min-w-0">
+                    <div>
                       <p className="text-sm font-medium text-white">{company.name}</p>
-                      <p className="text-xs text-gray-500 font-mono truncate">/{company.slug}/{company.id}</p>
+                      <p className="text-xs text-gray-500 font-mono">/{company.slug}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4">
@@ -35,8 +35,7 @@ export default function CompaniesPage() {
                     }`}>
                       {company.is_active ? 'Active' : 'Inactive'}
                     </span>
-                    <Link href={`/${company.slug}/${company.id}/dashboard`}
-                      className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium">
+                    <Link href={`/${company.slug}`} className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium">
                       <ExternalLink className="w-3 h-3" /> Open
                     </Link>
                   </div>
